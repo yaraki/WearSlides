@@ -4,5 +4,7 @@
     <string name="app_name">Wear Slides</string>
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
+    <string name="go_to_next">Next</string>
+    <string name="go_to_prev">Prev</string>
 
 </resources>
