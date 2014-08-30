@@ -43,8 +43,7 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>プレゼン</h1>
-					<h3>プレゼンのプレゼン</h3>
+					<h1>プレゼンの<br/>プレゼン</h1>
 					<p>Takashi Egawa / Yuichi Araki</p>
 				</section>
 
@@ -54,11 +53,19 @@
 					<table style="margin:auto;">
 						<tr>
 							<th>江川崇</th>
-							<td>GDE<br /><img src="https://pbs.twimg.com/profile_images/942995772/eg.jpg" width="100" height="100" /></td>
+							<td>
+								@t_egg<br />
+								GDE<br />
+								<img src="https://pbs.twimg.com/profile_images/942995772/eg.jpg" width="100" height="100" />
+							</td>
 						</tr>
 						<tr>
 							<th>荒木佑一</th>
-							<td>Developer Programs Engineer<br><img src="https://pbs.twimg.com/profile_images/1292659254/my-icon.jpg" width="100" height="100" /></td>
+							<td>
+								@yuichi_araki<br />
+								Developer Programs Engineer<br />
+								<img src="https://pbs.twimg.com/profile_images/1292659254/my-icon.jpg" width="100" height="100" />
+							</td>
 						</tr>
 					</table>
 				</section>
@@ -72,24 +79,54 @@
 				</section>
 
 				<section>
-					<h2>Pretty Code</h2>
+					<img src="img/image.png" />
+				</section>
+
+				<section>
+					<h2>送る側（腕時計）</h2>
 					<pre><code data-trim contenteditable>
-function linkify( selector ) {
-  if( supports3DTransforms ) {
-
-    var nodes = document.querySelectorAll( selector );
-
-    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-      var node = nodes[i];
-
-      if( !node.className ) {
-        node.className += ' roll';
-      }
-    }
-  }
+/**
+ * @param node 送り先
+ * @param path "/next" か "/prev"
+ */
+private void sendMessage(String node, String path) {
+    Wearable.MessageApi.sendMessage(
+            mGoogleApiClient, node, path, new byte[0]).setResultCallback(
+            new ResultCallback&lt;MessageApi.SendMessageResult&gt;() {
+                @Override
+                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                    if (!sendMessageResult.getStatus().isSuccess()) {
+                        // エラー処理
+                    }
+                }
+            }
+    );
 }
 					</code></pre>
-					<p>Courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
+				</section>
+
+				<section>
+					<h2>受け取る側（電話）</h2>
+					<pre><code data-trim contenteditable>
+// event に Wear からのイベント内容が入っている
+@Override
+public void onMessageReceived(final MessageEvent event) {
+    Log.d(TAG, "onMessageReceived: " + event);
+    runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            String path = event.getPath();
+            if ("/next".equals(path)) {
+                mSlidesFragment.navigateNext(); // 次のページヘ
+            } else if ("/prev".equals(path)) {
+                mSlidesFragment.navigatePrev(); // 前のページに
+            } else {
+                Log.d(TAG, "Unknown path: " + path);
+            }
+        }
+    });
+}
+					</code></pre>
 				</section>
 
 				<section>
