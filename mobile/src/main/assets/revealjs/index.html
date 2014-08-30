@@ -111,7 +111,6 @@ private void sendMessage(String node, String path) {
 // event に Wear からのイベント内容が入っている
 @Override
 public void onMessageReceived(final MessageEvent event) {
-    Log.d(TAG, "onMessageReceived: " + event);
     runOnUiThread(new Runnable() {
         @Override
         public void run() {

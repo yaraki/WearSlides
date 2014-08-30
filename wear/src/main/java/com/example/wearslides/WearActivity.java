@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -45,6 +47,7 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
         setContentView(R.layout.activity);
         final GridViewPager gridViewPager = (GridViewPager) findViewById(R.id.gridViewPager);
         gridViewPager.setAdapter(new MyAdapter());
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
