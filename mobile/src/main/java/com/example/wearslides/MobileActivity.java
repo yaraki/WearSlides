@@ -27,15 +27,22 @@ public class MobileActivity extends Activity implements GoogleApiClient.Connecti
     private static final String NEXT_PATH = "/next";
     private static final String PREV_PATH = "/prev";
 
+    private SlidesFragment mSlidesFragment;
+    private static final String FRAGMENT_SLIDES = "slides";
+
     private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mobile);
         if (savedInstanceState == null) {
+            mSlidesFragment = new SlidesFragment();
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SlidesFragment())
+                    .add(R.id.container, mSlidesFragment)
                     .commit();
+        } else {
+            mSlidesFragment = (SlidesFragment) getFragmentManager()
+                    .findFragmentByTag(FRAGMENT_SLIDES);
         }
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -103,7 +110,14 @@ public class MobileActivity extends Activity implements GoogleApiClient.Connecti
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MobileActivity.this, "Event:" + event.getPath(), Toast.LENGTH_SHORT).show();
+                String path = event.getPath();
+                if (NEXT_PATH.equals(path)) {
+                    mSlidesFragment.navigateNext();
+                } else if (PREV_PATH.equals(path)) {
+                    mSlidesFragment.navigatePrev();
+                } else {
+                    Log.d(TAG, "Unknown path: " + path);
+                }
             }
         });
     }

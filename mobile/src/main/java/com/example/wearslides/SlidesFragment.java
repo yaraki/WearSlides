@@ -24,14 +24,14 @@ public class SlidesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mWebView = (WebView) view.findViewById(R.id.web_view);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadUrl("http://lab.hakim.se/reveal-js/#/");
+        mWebView.loadUrl("file:///android_asset/revealjs/index.html#/");
     }
 
-    private void navigateNext() {
+    public void navigateNext() {
         mWebView.loadUrl("javascript:Reveal.navigateNext()");
     }
 
-    private void navigatePrev() {
+    public void navigatePrev() {
         mWebView.loadUrl("javascript:Reveal.navigatePrev()");
     }
 
