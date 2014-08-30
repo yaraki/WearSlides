@@ -198,11 +198,11 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
                 if (TextUtils.isEmpty(result)) {
                     continue;
                 }
-                if (result.contains("次") || result.contains("つぎ") || result.contains("ツギ") || result.contains("戻")) {
+                if (result.contains("次") || result.contains("つぎ") || result.contains("ツギ") || result.contains("next")) {
                     gotoNext(null);
                     return;
                 }
-                if (result.contains("前") || result.contains("まえ") || result.contains("マエ") || result.contains("戻")) {
+                if (result.contains("前") || result.contains("まえ") || result.contains("マエ") || result.contains("戻") || result.contains("バック") || result.contains("back")) {
                     gotoPrev(null);
                     return;
                 }
