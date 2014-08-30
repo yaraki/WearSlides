@@ -1,12 +1,17 @@
 package com.example.wearslides;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
+import android.speech.RecognizerIntent;
+import android.support.wearable.view.GridPagerAdapter;
+import android.support.wearable.view.GridViewPager;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -22,6 +27,7 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class WearActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener,
@@ -31,20 +37,14 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
     private static final String NEXT_PATH = "/next";
     private static final String PREV_PATH = "/prev";
 
-    private TextView mTextView;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wear);
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mTextView = (TextView) stub.findViewById(R.id.text);
-            }
-        });
+        setContentView(R.layout.activity);
+        final GridViewPager gridViewPager = (GridViewPager) findViewById(R.id.gridViewPager);
+        gridViewPager.setAdapter(new MyAdapter());
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
@@ -122,6 +122,11 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
         new PrevTask().execute();
     }
 
+    public void inputByVoice(View view) {
+        Log.d(TAG, "Input via voice ");
+        displaySpeechRecognizer();
+    }
+
     private Collection<String> getNodes() {
         HashSet<String> results = new HashSet<String>();
         NodeApi.GetConnectedNodesResult nodes =
@@ -173,4 +178,64 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
         }
     }
 
-}
+    private static final int SPEECH_REQUEST_CODE = 0;
+
+    private void displaySpeechRecognizer() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        startActivityForResult(intent, SPEECH_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            for(String result : results) {
+                if (TextUtils.isEmpty(result)) {
+                    continue;
+                }
+                if (result.contains("次") || result.contains("つぎ") || result.contains("ツギ") || result.contains("戻")) {
+                    gotoNext(null);
+                    return;
+                }
+                if (result.contains("前") || result.contains("まえ") || result.contains("マエ") || result.contains("戻")) {
+                    gotoPrev(null);
+                    return;
+                }
+
+            }
+        }
+    }
+
+    public static class MyAdapter extends GridPagerAdapter {
+
+        @Override
+        protected Object instantiateItem(ViewGroup container, int row, int col) {
+            View view = LayoutInflater.from(container.getContext()).inflate(col == 0 ? R.layout.view_main : R.layout.view_voice, container, false);
+            container.addView(view);
+            return view;
+        }
+
+        @Override
+        protected void destroyItem(ViewGroup container, int row, int col, Object view) {
+            container.removeView((View)view);
+        }
+
+        @Override
+        public int getRowCount() {
+            return 1;
+        }
+
+        @Override
+        public int getColumnCount(final int row) {
+            return 2;
+        }
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view==object;
+        }
+    }}
