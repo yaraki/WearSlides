@@ -51,6 +51,7 @@ public class WearActivity extends Activity implements GoogleApiClient.Connection
                 .addOnConnectionFailedListener(this)
                 .build();
     }
+
     @Override
     protected void onResume() {
         super.onResume();
